@@ -1,0 +1,2 @@
+# pokedex
+Bootdev Pokedex project
