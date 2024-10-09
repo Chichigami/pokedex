@@ -7,16 +7,19 @@ import (
 
 func main() {
 	fmt.Println("Welcome to the Pokedex")
-	commands := getCommands()
+	var config = Config{}
 	for {
 		var input string
 		fmt.Print("Pokedex > ")
 		fmt.Scanln(&input)
 		input = strings.ToLower(input)
-		if _, ok := commands[input]; !ok {
+		if _, ok := getCommands()[input]; !ok {
 			fmt.Println("command not found")
 		} else {
-			commands[input].callback()
+			command_err := getCommands()[input].callback(&config)
+			if command_err != nil {
+				fmt.Println(command_err)
+			}
 		}
 	}
 }
