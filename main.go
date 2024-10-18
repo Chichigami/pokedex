@@ -8,7 +8,7 @@ import (
 func main() {
 	fmt.Println("Welcome to the Pokedex")
 	var config = Config{}
-	for {
+	for {	
 		var input string
 		fmt.Print("Pokedex > ")
 		fmt.Scanln(&input)

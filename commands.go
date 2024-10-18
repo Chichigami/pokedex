@@ -11,8 +11,8 @@ import (
 
 func commandHelp(cfg *Config) error {
 	commands := "Usage: \n"
-	for k := range getCommands() {
-		commands += fmt.Sprintf("%s: %s\n", getCommands()[k].name, getCommands()[k].description)
+	for command := range getCommands() {
+		commands += fmt.Sprintf("%s: %s\n", getCommands()[command].name, getCommands()[command].description)
 	}
 	fmt.Println(commands)
 	return nil
