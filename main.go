@@ -13,7 +13,8 @@ import (
 func main() {
 	fmt.Println("Welcome to the Pokedex")
 	var config = Config{
-		cache: pokecache.NewCache(10 * time.Minute),
+		cache:          pokecache.NewCache(10 * time.Minute),
+		caughtPokemons: map[string]Pokemon{},
 	}
 
 	for {

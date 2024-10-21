@@ -27,15 +27,21 @@ func getCommands() map[string]cliCommand {
 		"explore": {
 			name:        "explore",
 			description: "Explore the given region",
-			callback:    explore,
+			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Catch that pokemon",
+			callback:    commandCatch,
 		},
 	}
 }
 
 type Config struct {
-	Next     string
-	Previous string
-	cache    *pokecache.Cache
+	Next           string
+	Previous       string
+	cache          *pokecache.Cache
+	caughtPokemons map[string]Pokemon
 }
 
 type cliCommand struct {
