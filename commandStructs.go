@@ -1,10 +1,6 @@
 package main
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(*Config) error
-}
+import pokecache "github.com/chichigami/pokedex/internal"
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
@@ -28,10 +24,22 @@ func getCommands() map[string]cliCommand {
 			description: "Opposite of map command. Will display previous 20 locations.",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Explore the given region",
+			callback:    explore,
+		},
 	}
 }
 
 type Config struct {
 	Next     string
 	Previous string
+	cache    *pokecache.Cache
+}
+
+type cliCommand struct {
+	name        string
+	description string
+	callback    func(*Config, ...string) error
 }
