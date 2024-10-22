@@ -170,6 +170,18 @@ func commandInspect(cfg *Config, args ...string) error {
 	return nil
 }
 
+func commandPokedex(cfg *Config, args ...string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("can't use any arguments with this command")
+	}
+	var pokemonUnorderedList string
+	for _, pokemon := range cfg.caughtPokemons {
+		pokemonUnorderedList += "  - " + pokemon.Name + "\n"
+	}
+	fmt.Printf("Your Pokedex:\n%s", pokemonUnorderedList)
+	return nil
+}
+
 // func getReqParser(url string, s struct{}) struct{} {
 // 	return struct{}
 // }
