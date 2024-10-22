@@ -25,18 +25,25 @@ func commandExit(cfg *Config, args ...string) error {
 
 func commandMap(cfg *Config, args ...string) error {
 	if len(args) != 0 {
-		return fmt.Errorf("can't use map with any arguments")
+		return fmt.Errorf("can't use any arguments with this command")
 	}
 	if cfg.Next == "" {
-		cfg.Next = "https://pokeapi.co/api/v2/location-area/"
+		cfg.Next = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 	}
+
 	var currentLocations area
-	res, res_err := http.Get(cfg.Next)
-	if res_err != nil {
-		fmt.Println(res_err)
+	var body []byte
+	body, ok := cfg.cache.Get(cfg.Next)
+	if !ok {
+		res, res_err := http.Get(cfg.Next)
+		if res_err != nil {
+			fmt.Println(res_err)
+		}
+		body, _ = io.ReadAll(res.Body)
+		defer res.Body.Close()
+		cfg.cache.Add(cfg.Next, body)
 	}
-	body, _ := io.ReadAll(res.Body)
-	defer res.Body.Close()
+
 	err := json.Unmarshal(body, &currentLocations)
 	if err != nil {
 		fmt.Println(err)
@@ -53,25 +60,32 @@ func commandMap(cfg *Config, args ...string) error {
 
 func commandMapb(cfg *Config, args ...string) error {
 	if len(args) != 0 {
-		return fmt.Errorf("can't use mapb with any arguments")
+		return fmt.Errorf("can't use any arguments with this command")
 	}
 	if cfg.Previous == "" {
 		return fmt.Errorf("can't go backwards")
 	}
 	var currentLocations area
-	res, res_err := http.Get(cfg.Previous)
-	if res_err != nil {
-		fmt.Println(res_err)
+	var body []byte
+	var twentyLocations string
+
+	body, ok := cfg.cache.Get(cfg.Previous)
+	if !ok {
+		res, res_err := http.Get(cfg.Previous)
+		if res_err != nil {
+			fmt.Println(res_err)
+		}
+		body, _ = io.ReadAll(res.Body)
+		defer res.Body.Close()
+		cfg.cache.Add(cfg.Previous, body)
 	}
-	body, _ := io.ReadAll(res.Body)
-	defer res.Body.Close()
+	cfg.Next = currentLocations.Next
+	cfg.Previous = currentLocations.Previous
+
 	err := json.Unmarshal(body, &currentLocations)
 	if err != nil {
 		fmt.Println(err)
 	}
-	cfg.Next = currentLocations.Next
-	cfg.Previous = currentLocations.Previous
-	var twentyLocations string
 	for _, location := range currentLocations.Results {
 		twentyLocations += location.Name + "\n"
 	}
@@ -107,8 +121,8 @@ func commandExplore(cfg *Config, args ...string) error {
 			fmt.Println(err)
 		}
 
-		for _, pokemon_struct := range area.PokemonEncounters {
-			pokemons += pokemon_struct.Pokemon.Name + "\n"
+		for _, pokemonStruct := range area.PokemonEncounters {
+			pokemons += pokemonStruct.Pokemon.Name + "\n"
 		}
 		fmt.Println(pokemons)
 		return nil
@@ -181,7 +195,3 @@ func commandPokedex(cfg *Config, args ...string) error {
 	fmt.Printf("Your Pokedex:\n%s", pokemonUnorderedList)
 	return nil
 }
-
-// func getReqParser(url string, s struct{}) struct{} {
-// 	return struct{}
-// }
