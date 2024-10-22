@@ -115,6 +115,9 @@ func commandExplore(cfg *Config, args ...string) error {
 }
 
 func commandCatch(cfg *Config, args ...string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("need a target")
+	}
 	var pokemon Pokemon
 	var body []byte
 	url := "https://pokeapi.co/api/v2/pokemon/" + strings.ToLower(args[0])
@@ -142,6 +145,9 @@ func commandCatch(cfg *Config, args ...string) error {
 }
 
 func commandInspect(cfg *Config, args ...string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("need a pokemon to inspect")
+	}
 	pokemon, ok := cfg.caughtPokemons[args[0]]
 	if !ok {
 		fmt.Println("you have not caught that pokemon")
