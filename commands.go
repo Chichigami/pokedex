@@ -138,10 +138,34 @@ func commandCatch(cfg *Config, args ...string) error {
 			fmt.Printf("%s was caught! \n", pokemon.Name)
 			cfg.caughtPokemons[pokemon.Name] = pokemon
 		} else {
-			fmt.Printf("%s escaped!", pokemon.Name)
+			fmt.Printf("%s escaped!\n", pokemon.Name)
 		}
 	} else {
 		fmt.Println("pokemon already caught")
+	}
+	return nil
+}
+
+func commandInspect(cfg *Config, args ...string) error {
+	pokemon, ok := cfg.caughtPokemons[args[0]]
+	if !ok {
+		fmt.Println("you have not caught that pokemon")
+	} else {
+		var typesUnorderedList string
+		var statUnorderedList string
+		for _, typeStruct := range pokemon.Types {
+			typesUnorderedList += fmt.Sprintf("  - %s\n", typeStruct.Type.Name)
+		}
+		for _, statStruct := range pokemon.Stats {
+			statUnorderedList += fmt.Sprintf("  -%s: %d\n", statStruct.Stat.Name, statStruct.BaseStat)
+		}
+		fmt.Printf("Name: %s\n"+
+			"Height: %v\n"+
+			"Weight: %v\n"+
+			"Stats:\n"+
+			"%s"+
+			"Types:\n"+
+			"%s\n", pokemon.Name, pokemon.Height, pokemon.Weight, statUnorderedList, typesUnorderedList)
 	}
 	return nil
 }
