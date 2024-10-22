@@ -30,27 +30,21 @@ func commandMap(cfg *Config, args ...string) error {
 	if cfg.Next == "" {
 		cfg.Next = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 	}
-
-	var currentLocations area
 	var body []byte
+	var currentLocations area
+	var twentyLocations string
+
 	body, ok := cfg.cache.Get(cfg.Next)
 	if !ok {
-		res, res_err := http.Get(cfg.Next)
-		if res_err != nil {
-			fmt.Println(res_err)
-		}
-		body, _ = io.ReadAll(res.Body)
-		defer res.Body.Close()
-		cfg.cache.Add(cfg.Next, body)
+		body, _ = fetchAndCache(cfg, cfg.Next)
 	}
-
 	err := json.Unmarshal(body, &currentLocations)
 	if err != nil {
 		fmt.Println(err)
 	}
 	cfg.Next = currentLocations.Next
 	cfg.Previous = currentLocations.Previous
-	var twentyLocations string
+
 	for _, location := range currentLocations.Results {
 		twentyLocations += location.Name + "\n"
 	}
@@ -71,21 +65,15 @@ func commandMapb(cfg *Config, args ...string) error {
 
 	body, ok := cfg.cache.Get(cfg.Previous)
 	if !ok {
-		res, res_err := http.Get(cfg.Previous)
-		if res_err != nil {
-			fmt.Println(res_err)
-		}
-		body, _ = io.ReadAll(res.Body)
-		defer res.Body.Close()
-		cfg.cache.Add(cfg.Previous, body)
+		body, _ = fetchAndCache(cfg, cfg.Previous)
 	}
-	cfg.Next = currentLocations.Next
-	cfg.Previous = currentLocations.Previous
-
 	err := json.Unmarshal(body, &currentLocations)
 	if err != nil {
 		fmt.Println(err)
 	}
+	cfg.Next = currentLocations.Next
+	cfg.Previous = currentLocations.Previous
+
 	for _, location := range currentLocations.Results {
 		twentyLocations += location.Name + "\n"
 	}
@@ -107,14 +95,9 @@ func commandExplore(cfg *Config, args ...string) error {
 
 		body, ok := cfg.cache.Get(url)
 		if !ok {
-			res, err := http.Get(url)
-			if err != nil {
-				fmt.Println(err)
-			}
-			body, _ = io.ReadAll(res.Body)
-			defer res.Body.Close()
-			cfg.cache.Add(url, body)
+			body, _ = fetchAndCache(cfg, url)
 		}
+
 		fmt.Println("Found Pokemon(s):")
 		err := json.Unmarshal(body, &area)
 		if err != nil {
@@ -133,21 +116,19 @@ func commandExplore(cfg *Config, args ...string) error {
 
 func commandCatch(cfg *Config, args ...string) error {
 	var pokemon Pokemon
-	target := strings.ToLower(args[0])
-	url := "https://pokeapi.co/api/v2/pokemon/" + target
-	_, ok := cfg.caughtPokemons[target]
+	var body []byte
+	url := "https://pokeapi.co/api/v2/pokemon/" + strings.ToLower(args[0])
+	_, ok := cfg.caughtPokemons[strings.ToLower(args[0])]
 	if !ok {
-		res, err := http.Get(url)
+		if body, ok = cfg.cache.Get(url); !ok {
+			body, _ = fetchAndCache(cfg, url)
+		}
+		err := json.Unmarshal(body, &pokemon)
 		if err != nil {
 			fmt.Println(err)
 		}
-		body, _ := io.ReadAll(res.Body)
-		defer res.Body.Close()
-		err = json.Unmarshal(body, &pokemon)
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Printf("Throwing a pokeball at %s...\n", target)
+
+		fmt.Printf("Throwing a pokeball at %s...\n", strings.ToLower(args[0]))
 		if pokemon.Caught() {
 			fmt.Printf("%s was caught! \n", pokemon.Name)
 			cfg.caughtPokemons[pokemon.Name] = pokemon
@@ -194,4 +175,15 @@ func commandPokedex(cfg *Config, args ...string) error {
 	}
 	fmt.Printf("Your Pokedex:\n%s", pokemonUnorderedList)
 	return nil
+}
+
+func fetchAndCache(cfg *Config, url string) ([]byte, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println(err)
+	}
+	body, _ := io.ReadAll(res.Body)
+	defer res.Body.Close()
+	cfg.cache.Add(url, body)
+	return body, nil
 }
