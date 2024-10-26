@@ -3,10 +3,17 @@
 Bootdev Pokedex project
 Pokedex CLI REPL using https://pokeapi.co/
 
-**The learning goals**
+## How to download and install
 
-- Learn how to parse JSON in Go
-- Practice making HTTP requests in Go
-- Learn how to build a CLI tool that makes interacting with a back-end server easier
-- Get hands-on practice with local Go development and tooling
-- Learn about caching and how to use it to improve performance
+Download and run
+
+## Commands
+
+- help: Display help message
+- exit: Exit the pokedex
+- map: Displays 20 locations. Can use again to get the next 20.
+- mapb: Like map but backwards.
+- explore: Explore the given location.
+- catch: Catch that pokemon
+- inspect: Info about the pokemon
+- pokedex: Shows a list of all the Pokemon's you caught
