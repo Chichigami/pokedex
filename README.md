@@ -1,7 +1,7 @@
 # pokedex
 
 Bootdev Pokedex project
-Pokedex command line REPL using https://pokeapi.co/
+Pokedex CLI REPL using https://pokeapi.co/
 
 **The learning goals**
 
