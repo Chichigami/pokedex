@@ -1,11 +1,10 @@
 # pokedex
 
-Bootdev Pokedex project
 Pokedex CLI REPL using https://pokeapi.co/
 
 ## How to download and install
 
-Download and run
+Download the zip and run `go build && ./pokedex`
 
 ## Commands
 
