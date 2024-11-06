@@ -1,6 +1,6 @@
-# pokedex
+# Pokedex CLI REPL 
 
-Pokedex CLI REPL using https://pokeapi.co/
+Using https://pokeapi.co/ for Pokemon info
 
 ## How to download and install
 
